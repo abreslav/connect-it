@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect-it!</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #faf8ef;
+            color: #776e65;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .game-container {
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+            color: #776e65;
+        }
+
+        .preview {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .preview-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .preview-circle.visible {
+            opacity: 1;
+        }
+
+        .game-board {
+            background: #bbada0;
+            border-radius: 6px;
+            padding: 10px;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-gap: 10px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .cell {
+            width: 70px;
+            height: 70px;
+            background: #cdc1b4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.1s;
+            position: relative;
+        }
+
+        .cell:hover {
+            transform: scale(1.05);
+        }
+
+        .cell.rim {
+            border: 3px solid white;
+            box-sizing: border-box;
+        }
+
+        /* 2048-style colors */
+        .cell[data-value="2"] { background: #eee4da; color: #776e65; }
+        .cell[data-value="4"] { background: #ede0c8; color: #776e65; }
+        .cell[data-value="8"] { background: #f2b179; color: white; }
+        .cell[data-value="16"] { background: #f59563; color: white; }
+        .cell[data-value="32"] { background: #f67c5f; color: white; }
+        .cell[data-value="64"] { background: #f65e3b; color: white; }
+        .cell[data-value="128"] { background: #edcf72; color: white; }
+        .cell[data-value="256"] { background: #edcc61; color: white; }
+        .cell[data-value="512"] { background: #edc850; color: white; }
+        .cell[data-value="1024"] { background: #edc53f; color: white; }
+        .cell[data-value="2048"] { background: #edc22e; color: white; }
+
+        /* Higher values cycle through colors */
+        .cell[data-value="4096"] { background: #eee4da; color: #776e65; }
+        .cell[data-value="8192"] { background: #ede0c8; color: #776e65; }
+        .cell[data-value="16384"] { background: #f2b179; color: white; }
+        .cell[data-value="32768"] { background: #f59563; color: white; }
+        .cell[data-value="65536"] { background: #f67c5f; color: white; }
+        .cell[data-value="131072"] { background: #f65e3b; color: white; }
+        .cell[data-value="262144"] { background: #edcf72; color: white; }
+        .cell[data-value="524288"] { background: #edcc61; color: white; }
+        .cell[data-value="1048576"] { background: #edc850; color: white; }
+        .cell[data-value="2097152"] { background: #edc53f; color: white; }
+        .cell[data-value="4194304"] { background: #edc22e; color: white; }
+
+        .cell.connected {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .connection-line {
+            position: absolute;
+            height: 4px;
+            background: currentColor;
+            transform-origin: left center;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .reset-button {
+            background: #8f7a66;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .reset-button:hover {
+            background: #9f8a76;
+        }
+
+        @media (max-width: 600px) {
+            .game-board {
+                padding: 5px;
+                grid-gap: 5px;
+            }
+
+            .cell {
+                width: 60px;
+                height: 60px;
+                font-size: 14px;
+            }
+
+            h1 {
+                font-size: 36px;
+            }
+
+            .preview-circle {
+                width: 50px;
+                height: 50px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Connect-it!</h1>
+        <div class="preview">
+            <div class="preview-circle" id="previewCircle"></div>
+        </div>
+        <div class="game-board" id="gameBoard"></div>
+        <button class="reset-button" onclick="resetGame()">Reset</button>
+    </div>
+
+    <script>
+        class ConnectItGame {
+            constructor() {
+                this.board = [];
+                this.size = 5;
+                this.isConnecting = false;
+                this.connectedCells = [];
+                this.startCell = null;
+                this.currentValue = 0;
+                this.connectionLines = [];
+
+                this.initializeBoard();
+                this.loadGame();
+                this.render();
+                this.setupEventListeners();
+            }
+
+            initializeBoard() {
+                for (let i = 0; i < this.size; i++) {
+                    this.board[i] = [];
+                    for (let j = 0; j < this.size; j++) {
+                        this.board[i][j] = this.getRandomPowerOf2();
+                    }
+                }
+                this.ensurePlayable();
+            }
+
+            getRandomPowerOf2() {
+                const powers = [2, 4, 8, 16, 32];
+                return powers[Math.floor(Math.random() * powers.length)];
+            }
+
+            ensurePlayable() {
+                let hasAdjacent = false;
+
+                // Check if there are any adjacent pairs
+                for (let i = 0; i < this.size; i++) {
+                    for (let j = 0; j < this.size; j++) {
+                        const neighbors = this.getNeighbors(i, j);
+                        for (const [ni, nj] of neighbors) {
+                            if (this.board[i][j] === this.board[ni][nj]) {
+                                hasAdjacent = true;
+                                break;
+                            }
+                        }
+                        if (hasAdjacent) break;
+                    }
+                    if (hasAdjacent) break;
+                }
+
+                // If no adjacent pairs, create some
+                if (!hasAdjacent) {
+                    let changes = 0;
+                    while (changes < 3 && !this.hasAdjacentPairs()) {
+                        const i = Math.floor(Math.random() * this.size);
+                        const j = Math.floor(Math.random() * this.size);
+                        const neighbors = this.getNeighbors(i, j);
+
+                        if (neighbors.length > 0) {
+                            const [ni, nj] = neighbors[Math.floor(Math.random() * neighbors.length)];
+                            this.board[i][j] = this.board[ni][nj];
+                            changes++;
+                        }
+                    }
+                }
+            }
+
+            hasAdjacentPairs() {
+                for (let i = 0; i < this.size; i++) {
+                    for (let j = 0; j < this.size; j++) {
+                        const neighbors = this.getNeighbors(i, j);
+                        for (const [ni, nj] of neighbors) {
+                            if (this.board[i][j] === this.board[ni][nj]) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+
+            getNeighbors(row, col) {
+                const neighbors = [];
+                for (let di = -1; di <= 1; di++) {
+                    for (let dj = -1; dj <= 1; dj++) {
+                        if (di === 0 && dj === 0) continue;
+                        const ni = row + di;
+                        const nj = col + dj;
+                        if (ni >= 0 && ni < this.size && nj >= 0 && nj < this.size) {
+                            neighbors.push([ni, nj]);
+                        }
+                    }
+                }
+                return neighbors;
+            }
+
+            formatNumber(value) {
+                if (value < 1024) {
+                    return value.toString();
+                } else if (value < 1048576) {
+                    return (value / 1024) + 'K';
+                } else {
+                    return (value / 1048576) + 'M';
+                }
+            }
+
+            needsRim(value) {
+                return value >= 1024 && value < 1048576;
+            }
+
+            getBiggestPowerOf2(sum) {
+                if (sum <= 1) return 1;
+                let power = 1;
+                while (power * 2 <= sum) {
+                    power *= 2;
+                }
+                return power;
+            }
+
+            render() {
+                const gameBoard = document.getElementById('gameBoard');
+                gameBoard.innerHTML = '';
+
+                for (let i = 0; i < this.size; i++) {
+                    for (let j = 0; j < this.size; j++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'cell';
+                        cell.dataset.value = this.board[i][j];
+                        cell.dataset.row = i;
+                        cell.dataset.col = j;
+                        cell.textContent = this.formatNumber(this.board[i][j]);
+
+                        if (this.needsRim(this.board[i][j])) {
+                            cell.classList.add('rim');
+                        }
+
+                        gameBoard.appendChild(cell);
+                    }
+                }
+            }
+
+            setupEventListeners() {
+                const gameBoard = document.getElementById('gameBoard');
+
+                // Mouse events
+                gameBoard.addEventListener('mousedown', this.handleStart.bind(this));
+                gameBoard.addEventListener('mousemove', this.handleMove.bind(this));
+                gameBoard.addEventListener('mouseup', this.handleEnd.bind(this));
+                gameBoard.addEventListener('mouseleave', this.handleEnd.bind(this));
+
+                // Touch events
+                gameBoard.addEventListener('touchstart', this.handleStart.bind(this));
+                gameBoard.addEventListener('touchmove', this.handleMove.bind(this));
+                gameBoard.addEventListener('touchend', this.handleEnd.bind(this));
+            }
+
+            handleStart(event) {
+                event.preventDefault();
+                const cell = event.target.closest('.cell');
+                if (!cell) return;
+
+                this.isConnecting = true;
+                this.startCell = {
+                    row: parseInt(cell.dataset.row),
+                    col: parseInt(cell.dataset.col)
+                };
+                this.currentValue = this.board[this.startCell.row][this.startCell.col];
+                this.connectedCells = [this.startCell];
+                this.updateConnectedCells();
+                this.updatePreview();
+            }
+
+            handleMove(event) {
+                if (!this.isConnecting) return;
+                event.preventDefault();
+
+                const clientX = event.clientX || (event.touches && event.touches[0].clientX);
+                const clientY = event.clientY || (event.touches && event.touches[0].clientY);
+
+                const element = document.elementFromPoint(clientX, clientY);
+                const cell = element && element.closest('.cell');
+
+                if (!cell) return;
+
+                const row = parseInt(cell.dataset.row);
+                const col = parseInt(cell.dataset.col);
+
+                if (this.board[row][col] !== this.currentValue) return;
+
+                // Check if this cell is already in the path
+                const cellIndex = this.connectedCells.findIndex(c => c.row === row && c.col === col);
+
+                if (cellIndex !== -1) {
+                    // Backtrack: remove all cells after this one
+                    this.connectedCells = this.connectedCells.slice(0, cellIndex + 1);
+                } else {
+                    // Check if adjacent to last cell
+                    const lastCell = this.connectedCells[this.connectedCells.length - 1];
+                    const neighbors = this.getNeighbors(lastCell.row, lastCell.col);
+                    const isAdjacent = neighbors.some(([nr, nc]) => nr === row && nc === col);
+
+                    if (isAdjacent) {
+                        this.connectedCells.push({ row, col });
+                    }
+                }
+
+                this.updateConnectedCells();
+                this.updatePreview();
+            }
+
+            handleEnd(event) {
+                if (!this.isConnecting) return;
+                event.preventDefault();
+
+                this.isConnecting = false;
+
+                if (this.connectedCells.length > 1) {
+                    this.collapseConnectedCells();
+                }
+
+                this.clearConnections();
+                this.hidePreview();
+                this.saveGame();
+            }
+
+            updateConnectedCells() {
+                // Clear all connection visuals
+                this.clearConnections();
+
+                // Add connected class to cells
+                this.connectedCells.forEach(cell => {
+                    const cellElement = document.querySelector(`[data-row="${cell.row}"][data-col="${cell.col}"]`);
+                    if (cellElement) {
+                        cellElement.classList.add('connected');
+                    }
+                });
+
+                // Draw connection lines
+                for (let i = 0; i < this.connectedCells.length - 1; i++) {
+                    this.drawConnectionLine(this.connectedCells[i], this.connectedCells[i + 1]);
+                }
+            }
+
+            drawConnectionLine(cell1, cell2) {
+                const gameBoard = document.getElementById('gameBoard');
+                const cell1Element = document.querySelector(`[data-row="${cell1.row}"][data-col="${cell1.col}"]`);
+                const cell2Element = document.querySelector(`[data-row="${cell2.row}"][data-col="${cell2.col}"]`);
+
+                if (!cell1Element || !cell2Element) return;
+
+                const rect1 = cell1Element.getBoundingClientRect();
+                const rect2 = cell2Element.getBoundingClientRect();
+                const boardRect = gameBoard.getBoundingClientRect();
+
+                const x1 = rect1.left + rect1.width / 2 - boardRect.left;
+                const y1 = rect1.top + rect1.height / 2 - boardRect.top;
+                const x2 = rect2.left + rect2.width / 2 - boardRect.left;
+                const y2 = rect2.top + rect2.height / 2 - boardRect.top;
+
+                const length = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+                const angle = Math.atan2(y2 - y1, x2 - x1);
+
+                const line = document.createElement('div');
+                line.className = 'connection-line';
+                line.style.left = x1 + 'px';
+                line.style.top = y1 + 'px';
+                line.style.width = length + 'px';
+                line.style.transform = `rotate(${angle}rad)`;
+                line.style.color = window.getComputedStyle(cell1Element).backgroundColor;
+
+                gameBoard.appendChild(line);
+                this.connectionLines.push(line);
+            }
+
+            clearConnections() {
+                // Remove connected class from all cells
+                document.querySelectorAll('.cell.connected').forEach(cell => {
+                    cell.classList.remove('connected');
+                });
+
+                // Remove connection lines
+                this.connectionLines.forEach(line => line.remove());
+                this.connectionLines = [];
+            }
+
+            updatePreview() {
+                const previewCircle = document.getElementById('previewCircle');
+
+                if (this.connectedCells.length <= 1) {
+                    previewCircle.classList.remove('visible');
+                    return;
+                }
+
+                const sum = this.connectedCells.length * this.currentValue;
+                const resultValue = this.getBiggestPowerOf2(sum);
+
+                previewCircle.textContent = this.formatNumber(resultValue);
+                previewCircle.dataset.value = resultValue;
+                previewCircle.classList.toggle('rim', this.needsRim(resultValue));
+                previewCircle.classList.add('visible');
+            }
+
+            hidePreview() {
+                const previewCircle = document.getElementById('previewCircle');
+                previewCircle.classList.remove('visible');
+            }
+
+            collapseConnectedCells() {
+                if (this.connectedCells.length <= 1) return;
+
+                const sum = this.connectedCells.length * this.currentValue;
+                const resultValue = this.getBiggestPowerOf2(sum);
+
+                // Set the last cell to the result value
+                const lastCell = this.connectedCells[this.connectedCells.length - 1];
+                this.board[lastCell.row][lastCell.col] = resultValue;
+
+                // Mark other cells as empty (we'll use 0 to represent empty)
+                for (let i = 0; i < this.connectedCells.length - 1; i++) {
+                    const cell = this.connectedCells[i];
+                    this.board[cell.row][cell.col] = 0;
+                }
+
+                // Apply gravity
+                this.applyGravity();
+
+                // Fill empty cells
+                this.fillEmptyCells();
+
+                // Re-render the board
+                this.render();
+            }
+
+            applyGravity() {
+                for (let j = 0; j < this.size; j++) {
+                    // Collect non-empty values in this column
+                    const values = [];
+                    for (let i = this.size - 1; i >= 0; i--) {
+                        if (this.board[i][j] !== 0) {
+                            values.push(this.board[i][j]);
+                        }
+                    }
+
+                    // Fill column from bottom up
+                    for (let i = this.size - 1; i >= 0; i--) {
+                        if (values.length > 0) {
+                            this.board[i][j] = values.shift();
+                        } else {
+                            this.board[i][j] = 0;
+                        }
+                    }
+                }
+            }
+
+            fillEmptyCells() {
+                const emptyCells = [];
+
+                // Find all empty cells
+                for (let i = 0; i < this.size; i++) {
+                    for (let j = 0; j < this.size; j++) {
+                        if (this.board[i][j] === 0) {
+                            emptyCells.push([i, j]);
+                        }
+                    }
+                }
+
+                // Fill with random values
+                emptyCells.forEach(([i, j]) => {
+                    this.board[i][j] = this.getRandomPowerOf2();
+                });
+
+                // Check if the board is still playable
+                if (!this.hasAdjacentPairs() && emptyCells.length > 0) {
+                    // Replace one random new cell with a value that matches an adjacent cell
+                    const randomNewCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                    const [i, j] = randomNewCell;
+                    const neighbors = this.getNeighbors(i, j);
+
+                    if (neighbors.length > 0) {
+                        const [ni, nj] = neighbors[Math.floor(Math.random() * neighbors.length)];
+                        this.board[i][j] = this.board[ni][nj];
+                    }
+                }
+            }
+
+            saveGame() {
+                localStorage.setItem('connectItGame', JSON.stringify(this.board));
+            }
+
+            loadGame() {
+                const savedGame = localStorage.getItem('connectItGame');
+                if (savedGame) {
+                    try {
+                        this.board = JSON.parse(savedGame);
+                        // Validate the loaded board
+                        if (!Array.isArray(this.board) || this.board.length !== this.size) {
+                            throw new Error('Invalid board size');
+                        }
+                        for (let i = 0; i < this.size; i++) {
+                            if (!Array.isArray(this.board[i]) || this.board[i].length !== this.size) {
+                                throw new Error('Invalid board structure');
+                            }
+                        }
+                    } catch (e) {
+                        // If loading fails, initialize new board
+                        this.initializeBoard();
+                    }
+                }
+            }
+
+            reset() {
+                this.initializeBoard();
+                this.render();
+                this.saveGame();
+            }
+        }
+
+        let game;
+
+        function initGame() {
+            game = new ConnectItGame();
+        }
+
+        function resetGame() {
+            game.reset();
+        }
+
+        // Initialize the game when the page loads
+        document.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
