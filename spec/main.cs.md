@@ -105,8 +105,8 @@ All parameters mentioned and implied above should be changeable through a Settin
 This includes parameters such as: 
 - delays for animations
 - element sizes
-- font sizes
-- colors
+- all font sizes
+- colors, including colors for cells with different numbers
 - other such parameters that cnage the appearance of the game
 
 There is a "Reset to defaults" button that resets all the settings.
