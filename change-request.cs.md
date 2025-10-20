@@ -1,1 +1,0 @@
-I observe a bug: There must be a preview above the game field while I'm connecting cells, but I can see no preview
