@@ -302,6 +302,10 @@
             {
                 "checkpoint": "{\"run\":{\"id\":\"1e904ccd-1378-4697-b656-4d149845c5e3\",\"kind\":\"change_request\"},\"phase_id\":\"ImplementChangeRequest\",\"additional_id\":null}",
                 "timestamp": "2025-10-20T17:14:29.980217+00:00"
+            },
+            {
+                "checkpoint": "{\"run\":{\"id\":\"1e904ccd-1378-4697-b656-4d149845c5e3\",\"kind\":\"change_request\"},\"phase_id\":\"Done\",\"additional_id\":null}",
+                "timestamp": "2025-10-20T17:14:29.998644+00:00"
             }
         ]
     }
