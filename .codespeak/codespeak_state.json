@@ -198,6 +198,10 @@
             {
                 "checkpoint": "{\"run\":{\"id\":\"f0e20676-dd34-48f4-b443-e818493a8bfb\",\"kind\":\"change_request\"},\"phase_id\":\"ImplementChangeRequest\",\"additional_id\":null}",
                 "timestamp": "2025-10-20T16:22:40.252931+00:00"
+            },
+            {
+                "checkpoint": "{\"run\":{\"id\":\"f0e20676-dd34-48f4-b443-e818493a8bfb\",\"kind\":\"change_request\"},\"phase_id\":\"Done\",\"additional_id\":null}",
+                "timestamp": "2025-10-20T16:22:40.270122+00:00"
             }
         ]
     }
