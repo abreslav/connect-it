@@ -23,32 +23,41 @@ The field is filled with random powers of 2 between 2 and 32. If there are no ad
 
 # Gameplay
 
-Starting with any cell, the user can drag the mouse/their finger through the cells of the same value adjacent to it. While dragging, the affected cells of the same value as the starting cell are connected by lines of the same color as the circles in the cells. A preview above the game field displays the biggest whole power of 2 the sum of all the affected cells has reached. If the user drags the pointer back along the connecting line, it cancels the line (as if the adjacent cell was never affected). When the user releases the pointer, the affected cells all collapse into the last affected one and it gets replaced by the biggest power of 2 their sum has reached. The collapsed cells disappear and the cells above them slide directly downward. the vacant spots are filled with new values generated according to the algorithm below.
+Starting with any cell, the user can drag the mouse/their finger through the cells of the same value adjacent to it. 
+While dragging, the affected cells of the same value as the starting cell are connected by lines of the same color as the circles in the cells. 
+A preview above the game field displays the biggest whole power of 2 the sum of all the affected cells has reached. 
+If the user drags the pointer back along the connecting line, it cancels the line (as if the adjacent cell was never affected). 
+When the user releases the pointer, the affected cells all collapse into the last affected one and it gets replaced by the biggest power of 2 their sum has reached. 
+The collapsed cells disappear and the cells above them slide directly downward. 
+The vacant spots are filled with new values generated according to the algorithm below.
 
 ## Rules of adjacency
 
 Two cells are adjacent if they share a side or a corner. Example:
 
+```
 NNNNN
 NAAAN
 NAXAN
 NAAAN
 NNNNN
+```
 
 The cells marked "A" are adjacent to the cell marked "X", while the cells marked "N" aren't
 
 The field is flat, meaning the the cells at the edges have fewer adjacent cells, e.g.:
 
+```
 NNNNN
 AANNN
 XANNN
 AANNN
 NNNNN
-
+```
 
 ## Biggest whole power of 2 calculation examples
 
-The value of the reulting cell after N cells of value X collapse is the biggest power of 2 that is less or equal to N * X, i.e. R = max(2^k | where 2^k <= N * X)
+The value of the resulting cell after N cells of value X collapse is the biggest power of 2 that is less or equal to N * X, i.e. R = max(2^k | where 2^k <= N * X)
 
 - if the user connects 2 cells of value 4, they collapse into an 8
 - if the user connects 3 cells of value 4, they collapse into an 8 (4+4 = 8, is the biggest power of 2 <= 4+4+4=12)
@@ -65,7 +74,6 @@ When the cells are vacated by some cells collapsing and then the cells above the
 
 The user can reset the game field by pressing "Reset". In this case, a new initial state is generated (and immediately saved).
 
-
 # Animations and smoothness
 
 It's important to maintain visual continuity for the user.
@@ -75,6 +83,15 @@ The field should always update smoothly: no blinking, and all changes should hap
 - the newly generated values appear in vacated cells simlutaneously with an animation: the circles started small in the center and grow to full size
 - the whole time of the collapse, fall and replace animation should be about 0.5 sec
 
+## Animating cell connections
+
+While the user is dragging the pointer and connecting cells of the same value:
+- the connections are straight lines from the center of one cell to the other
+- they are drawn before the circles and numbers to appear "underneath" the number
+- they have the same colour as the circles
+- the thickness of the connecting line is 1/5 of the circle diameter
+- the numbers in the affected cells become bigger
+- before the cell collapse animation, the connecting lines disappear
 
 # Users and data storage
 
