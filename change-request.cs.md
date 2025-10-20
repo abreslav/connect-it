@@ -1,1 +1,0 @@
-Make the base font size bigger so that the numbers' height is about 1/3 of the circle diameter. Also, make the enlarged font upon connecting closer to 3/4 of the diameter for the difference to be more noticeable
