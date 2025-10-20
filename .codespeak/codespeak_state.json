@@ -274,6 +274,10 @@
             {
                 "checkpoint": "{\"run\":{\"id\":\"a21684ed-d46f-4fcd-9afa-780538309eea\",\"kind\":\"change_request\"},\"phase_id\":\"ProcessChangeRequest\",\"additional_id\":null}",
                 "timestamp": "2025-10-20T17:08:58.422459+00:00"
+            },
+            {
+                "checkpoint": "{\"run\":{\"id\":\"a21684ed-d46f-4fcd-9afa-780538309eea\",\"kind\":\"change_request\"},\"phase_id\":\"CheckChangeRequestsContradictions\",\"additional_id\":null}",
+                "timestamp": "2025-10-20T17:09:02.671343+00:00"
             }
         ]
     }
