@@ -378,6 +378,10 @@
             {
                 "checkpoint": "{\"run\":{\"id\":\"1096818f-436e-40ce-8b6d-3e38327e0df7\",\"kind\":\"build\"},\"phase_id\":\"ImplementSpecWithClaudeCode\",\"additional_id\":null}",
                 "timestamp": "2025-10-20T17:30:12.498468+00:00"
+            },
+            {
+                "checkpoint": "{\"run\":{\"id\":\"1096818f-436e-40ce-8b6d-3e38327e0df7\",\"kind\":\"build\"},\"phase_id\":\"FeedbackLoopWithClaudeCode\",\"additional_id\":null}",
+                "timestamp": "2025-10-20T17:30:12.524283+00:00"
             }
         ]
     }
