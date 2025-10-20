@@ -88,31 +88,7 @@
             opacity: 1;
         }
 
-        /* Preview circle colors - same as cell colors */
-        .preview-circle[data-value="2"] { background: #eee4da; color: #776e65; }
-        .preview-circle[data-value="4"] { background: #ede0c8; color: #776e65; }
-        .preview-circle[data-value="8"] { background: #f2b179; color: white; }
-        .preview-circle[data-value="16"] { background: #f59563; color: white; }
-        .preview-circle[data-value="32"] { background: #f67c5f; color: white; }
-        .preview-circle[data-value="64"] { background: #f65e3b; color: white; }
-        .preview-circle[data-value="128"] { background: #edcf72; color: white; }
-        .preview-circle[data-value="256"] { background: #edcc61; color: white; }
-        .preview-circle[data-value="512"] { background: #edc850; color: white; }
-        .preview-circle[data-value="1024"] { background: #edc53f; color: white; }
-        .preview-circle[data-value="2048"] { background: #edc22e; color: white; }
-
-        /* Higher values cycle through colors */
-        .preview-circle[data-value="4096"] { background: #eee4da; color: #776e65; }
-        .preview-circle[data-value="8192"] { background: #ede0c8; color: #776e65; }
-        .preview-circle[data-value="16384"] { background: #f2b179; color: white; }
-        .preview-circle[data-value="32768"] { background: #f59563; color: white; }
-        .preview-circle[data-value="65536"] { background: #f67c5f; color: white; }
-        .preview-circle[data-value="131072"] { background: #f65e3b; color: white; }
-        .preview-circle[data-value="262144"] { background: #edcf72; color: white; }
-        .preview-circle[data-value="524288"] { background: #edcc61; color: white; }
-        .preview-circle[data-value="1048576"] { background: #edc850; color: white; }
-        .preview-circle[data-value="2097152"] { background: #edc53f; color: white; }
-        .preview-circle[data-value="4194304"] { background: #edc22e; color: white; }
+        /* Preview circle colors - dynamically applied via JavaScript */
 
         .preview-circle.rim {
             border: 3px solid white;
@@ -157,31 +133,7 @@
             box-sizing: border-box;
         }
 
-        /* 2048-style colors */
-        .cell[data-value="2"] { background: #eee4da; color: #776e65; }
-        .cell[data-value="4"] { background: #ede0c8; color: #776e65; }
-        .cell[data-value="8"] { background: #f2b179; color: white; }
-        .cell[data-value="16"] { background: #f59563; color: white; }
-        .cell[data-value="32"] { background: #f67c5f; color: white; }
-        .cell[data-value="64"] { background: #f65e3b; color: white; }
-        .cell[data-value="128"] { background: #edcf72; color: white; }
-        .cell[data-value="256"] { background: #edcc61; color: white; }
-        .cell[data-value="512"] { background: #edc850; color: white; }
-        .cell[data-value="1024"] { background: #edc53f; color: white; }
-        .cell[data-value="2048"] { background: #edc22e; color: white; }
-
-        /* Higher values cycle through colors */
-        .cell[data-value="4096"] { background: #eee4da; color: #776e65; }
-        .cell[data-value="8192"] { background: #ede0c8; color: #776e65; }
-        .cell[data-value="16384"] { background: #f2b179; color: white; }
-        .cell[data-value="32768"] { background: #f59563; color: white; }
-        .cell[data-value="65536"] { background: #f67c5f; color: white; }
-        .cell[data-value="131072"] { background: #f65e3b; color: white; }
-        .cell[data-value="262144"] { background: #edcf72; color: white; }
-        .cell[data-value="524288"] { background: #edcc61; color: white; }
-        .cell[data-value="1048576"] { background: #edc850; color: white; }
-        .cell[data-value="2097152"] { background: #edc53f; color: white; }
-        .cell[data-value="4194304"] { background: #edc22e; color: white; }
+        /* Cell colors - dynamically applied via JavaScript */
 
         .cell.connected {
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
@@ -447,19 +399,49 @@
                     </div>
 
                     <div class="settings-section">
-                        <h3>Font Sizes</h3>
+                        <h3>All Font Sizes</h3>
                         <label>Cell Font Size (px): <input type="number" name="cellFontSize" min="12" max="48" step="2"></label>
                         <label>Header Font Size (px): <input type="number" name="headerFontSize" min="24" max="72" step="4"></label>
                         <label>Preview Font Size (px): <input type="number" name="previewFontSize" min="10" max="32" step="2"></label>
                     </div>
 
                     <div class="settings-section">
-                        <h3>Colors</h3>
+                        <h3>Colors, including colors for cells with different numbers</h3>
                         <label>Background Color: <input type="color" name="backgroundColor"></label>
                         <label>Board Background: <input type="color" name="boardBackground"></label>
                         <label>Text Color: <input type="color" name="textColor"></label>
                         <label>Button Background: <input type="color" name="buttonBackground"></label>
                         <label>Empty Cell Color: <input type="color" name="emptyCellColor"></label>
+
+                        <div style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px;">
+                            <strong style="display: block; margin-bottom: 10px;">Cell Colors by Number:</strong>
+                            <label>2: <input type="color" name="cellColor2"></label>
+                            <label>4: <input type="color" name="cellColor4"></label>
+                            <label>8: <input type="color" name="cellColor8"></label>
+                            <label>16: <input type="color" name="cellColor16"></label>
+                            <label>32: <input type="color" name="cellColor32"></label>
+                            <label>64: <input type="color" name="cellColor64"></label>
+                            <label>128: <input type="color" name="cellColor128"></label>
+                            <label>256: <input type="color" name="cellColor256"></label>
+                            <label>512: <input type="color" name="cellColor512"></label>
+                            <label>1024: <input type="color" name="cellColor1024"></label>
+                            <label>2048: <input type="color" name="cellColor2048"></label>
+                        </div>
+
+                        <div style="margin-top: 10px;">
+                            <strong style="display: block; margin-bottom: 10px;">Cell Text Colors by Number:</strong>
+                            <label>2: <input type="color" name="cellTextColor2"></label>
+                            <label>4: <input type="color" name="cellTextColor4"></label>
+                            <label>8: <input type="color" name="cellTextColor8"></label>
+                            <label>16: <input type="color" name="cellTextColor16"></label>
+                            <label>32: <input type="color" name="cellTextColor32"></label>
+                            <label>64: <input type="color" name="cellTextColor64"></label>
+                            <label>128: <input type="color" name="cellTextColor128"></label>
+                            <label>256: <input type="color" name="cellTextColor256"></label>
+                            <label>512: <input type="color" name="cellTextColor512"></label>
+                            <label>1024: <input type="color" name="cellTextColor1024"></label>
+                            <label>2048: <input type="color" name="cellTextColor2048"></label>
+                        </div>
                     </div>
 
                     <div class="settings-section">
@@ -519,6 +501,32 @@
                     textColor: '#776e65',
                     buttonBackground: '#8f7a66',
                     emptyCellColor: '#cdc1b4',
+
+                    // Cell colors by number
+                    cellColor2: '#eee4da',
+                    cellColor4: '#ede0c8',
+                    cellColor8: '#f2b179',
+                    cellColor16: '#f59563',
+                    cellColor32: '#f67c5f',
+                    cellColor64: '#f65e3b',
+                    cellColor128: '#edcf72',
+                    cellColor256: '#edcc61',
+                    cellColor512: '#edc850',
+                    cellColor1024: '#edc53f',
+                    cellColor2048: '#edc22e',
+
+                    // Cell text colors by number
+                    cellTextColor2: '#776e65',
+                    cellTextColor4: '#776e65',
+                    cellTextColor8: '#ffffff',
+                    cellTextColor16: '#ffffff',
+                    cellTextColor32: '#ffffff',
+                    cellTextColor64: '#ffffff',
+                    cellTextColor128: '#ffffff',
+                    cellTextColor256: '#ffffff',
+                    cellTextColor512: '#ffffff',
+                    cellTextColor1024: '#ffffff',
+                    cellTextColor2048: '#ffffff',
 
                     // Other settings
                     connectionLineThickness: 14,
@@ -596,6 +604,47 @@
                 root.style.setProperty('--mobile-header-font-size', this.currentSettings.mobileHeaderFontSize + 'px');
                 root.style.setProperty('--mobile-preview-font-size', this.currentSettings.mobilePreviewFontSize + 'px');
                 root.style.setProperty('--mobile-connection-line-thickness', this.currentSettings.mobileConnectionLineThickness + 'px');
+
+                // Apply dynamic cell colors
+                this.applyCellColors();
+            }
+
+            applyCellColors() {
+                // Remove existing dynamic styles
+                const existingStyle = document.getElementById('dynamic-cell-colors');
+                if (existingStyle) {
+                    existingStyle.remove();
+                }
+
+                // Create new style element
+                const styleElement = document.createElement('style');
+                styleElement.id = 'dynamic-cell-colors';
+
+                let css = '';
+
+                // Values that we have specific color settings for
+                const cellValues = [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048];
+
+                cellValues.forEach(value => {
+                    const bgColor = this.currentSettings[`cellColor${value}`];
+                    const textColor = this.currentSettings[`cellTextColor${value}`];
+
+                    // Cell styles
+                    css += `.cell[data-value="${value}"] { background: ${bgColor}; color: ${textColor}; }\n`;
+                    css += `.preview-circle[data-value="${value}"] { background: ${bgColor}; color: ${textColor}; }\n`;
+
+                    // Higher values that cycle through the same colors (for values like 4K, 8K, etc.)
+                    let multiplier = 2;
+                    while (value * multiplier <= 4194304) { // Up to 4M as in the original CSS
+                        const higherValue = value * multiplier;
+                        css += `.cell[data-value="${higherValue}"] { background: ${bgColor}; color: ${textColor}; }\n`;
+                        css += `.preview-circle[data-value="${higherValue}"] { background: ${bgColor}; color: ${textColor}; }\n`;
+                        multiplier *= 2;
+                    }
+                });
+
+                styleElement.textContent = css;
+                document.head.appendChild(styleElement);
             }
 
             getSettingsAsJSON() {
