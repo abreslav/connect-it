@@ -11,10 +11,36 @@
             padding: 0;
         }
 
+        :root {
+            --animation-duration: 250ms;
+            --preview-transition: 200ms;
+            --cell-size: 70px;
+            --grid-gap: 10px;
+            --preview-circle-size: 60px;
+            --cell-font-size: 28px;
+            --header-font-size: 48px;
+            --preview-font-size: 18px;
+            --background-color: #faf8ef;
+            --board-background: #bbada0;
+            --text-color: #776e65;
+            --button-background: #8f7a66;
+            --empty-cell-color: #cdc1b4;
+            --connection-line-thickness: 14px;
+            --border-radius: 6px;
+            --hover-scale: 1.05;
+            --mobile-cell-size: 60px;
+            --mobile-grid-gap: 5px;
+            --mobile-preview-circle-size: 50px;
+            --mobile-cell-font-size: 24px;
+            --mobile-header-font-size: 36px;
+            --mobile-preview-font-size: 16px;
+            --mobile-connection-line-thickness: 12px;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            background: #faf8ef;
-            color: #776e65;
+            background: var(--background-color);
+            color: var(--text-color);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -29,9 +55,9 @@
         }
 
         h1 {
-            font-size: 48px;
+            font-size: var(--header-font-size);
             margin-bottom: 10px;
-            color: #776e65;
+            color: var(--text-color);
         }
 
         .preview {
@@ -45,17 +71,17 @@
         }
 
         .preview-circle {
-            width: 60px;
-            height: 60px;
+            width: var(--preview-circle-size);
+            height: var(--preview-circle-size);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
-            font-size: 18px;
+            font-size: var(--preview-font-size);
             opacity: 0;
-            transition: opacity 0.2s;
+            transition: opacity var(--preview-transition);
         }
 
         .preview-circle.visible {
@@ -94,36 +120,36 @@
         }
 
         .game-board {
-            background: #bbada0;
-            border-radius: 6px;
-            padding: 10px;
+            background: var(--board-background);
+            border-radius: var(--border-radius);
+            padding: var(--grid-gap);
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            grid-gap: 10px;
+            grid-gap: var(--grid-gap);
             position: relative;
             margin-bottom: 20px;
         }
 
         .cell {
-            width: 70px;
-            height: 70px;
-            background: #cdc1b4;
+            width: var(--cell-size);
+            height: var(--cell-size);
+            background: var(--empty-cell-color);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 28px; /* 20% larger than base font */
+            font-size: var(--cell-font-size);
             color: white;
             cursor: pointer;
             user-select: none;
             transition: transform 0.1s;
             position: relative;
-            z-index: 10; /* Ensure cells appear above connection lines */
+            z-index: 10;
         }
 
         .cell:hover {
-            transform: scale(1.05);
+            transform: scale(var(--hover-scale));
         }
 
         .cell.rim {
@@ -159,30 +185,30 @@
 
         .cell.connected {
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-            font-size: 52px; /* 3/4 of circle diameter (70px) for more noticeable difference */
+            font-size: calc(var(--cell-size) * 0.75);
         }
 
         .connection-line {
             position: absolute;
-            height: 14px; /* 1/5 of cell diameter (70px / 5 = 14px) */
+            height: var(--connection-line-thickness);
             background: currentColor;
             transform-origin: left center;
             pointer-events: none;
-            z-index: 5; /* Lower z-index to appear underneath circles */
+            z-index: 5;
         }
 
         .cell.moving {
-            transition: transform 0.25s ease-out;
+            transition: transform var(--animation-duration) ease-out;
             z-index: 20;
         }
 
         .cell.falling {
-            transition: transform 0.25s ease-out;
+            transition: transform var(--animation-duration) ease-out;
             z-index: 15;
         }
 
         .cell.new-cell {
-            animation: growIn 0.25s ease-out;
+            animation: growIn var(--animation-duration) ease-out;
         }
 
         @keyframes growIn {
@@ -194,50 +220,193 @@
             }
         }
 
-        .reset-button {
-            background: #8f7a66;
+        .button-row {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .reset-button, .settings-button {
+            background: var(--button-background);
             color: white;
             border: none;
             padding: 15px 30px;
-            border-radius: 6px;
+            border-radius: var(--border-radius);
             font-size: 18px;
             font-weight: bold;
             cursor: pointer;
             transition: background 0.2s;
         }
 
-        .reset-button:hover {
+        .reset-button:hover, .settings-button:hover {
             background: #9f8a76;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #faf8ef;
+            margin: 2% auto;
+            padding: 0;
+            border-radius: 6px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90%;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #776e65;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close:hover, .close:focus {
+            color: #776e65;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .settings-section {
+            margin-bottom: 30px;
+        }
+
+        .settings-section h3 {
+            color: #776e65;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .settings-section label {
+            display: block;
+            margin-bottom: 10px;
+            color: #776e65;
+            font-weight: bold;
+        }
+
+        .settings-section input {
+            margin-left: 10px;
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 14px;
+            width: 80px;
+        }
+
+        .settings-section input[type="color"] {
+            width: 50px;
+            height: 30px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .modal-footer {
+            padding: 20px 30px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .modal-button {
+            background: #bbada0;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .modal-button:hover {
+            background: #a59993;
+        }
+
+        .modal-button.primary {
+            background: #8f7a66;
+        }
+
+        .modal-button.primary:hover {
+            background: #9f8a76;
+        }
+
+        #jsonDisplay {
+            width: 100%;
+            height: 300px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            resize: vertical;
+            background: #f9f9f9;
         }
 
         @media (max-width: 600px) {
             .game-board {
-                padding: 5px;
-                grid-gap: 5px;
+                padding: var(--mobile-grid-gap);
+                grid-gap: var(--mobile-grid-gap);
             }
 
             .cell {
-                width: 60px;
-                height: 60px;
-                font-size: 24px; /* 20% larger than base font for mobile */
+                width: var(--mobile-cell-size);
+                height: var(--mobile-cell-size);
+                font-size: var(--mobile-cell-font-size);
             }
 
             .cell.connected {
-                font-size: 45px; /* 3/4 of mobile circle diameter (60px) */
+                font-size: calc(var(--mobile-cell-size) * 0.75);
             }
 
             .connection-line {
-                height: 12px; /* 1/5 of mobile cell diameter (60px / 5 = 12px) */
+                height: var(--mobile-connection-line-thickness);
             }
 
             h1 {
-                font-size: 36px;
+                font-size: var(--mobile-header-font-size);
             }
 
             .preview-circle {
-                width: 50px;
-                height: 50px;
-                font-size: 16px;
+                width: var(--mobile-preview-circle-size);
+                height: var(--mobile-preview-circle-size);
+                font-size: var(--mobile-preview-font-size);
             }
         }
     </style>
@@ -249,10 +418,191 @@
             <div class="preview-circle" id="previewCircle"></div>
         </div>
         <div class="game-board" id="gameBoard"></div>
-        <button class="reset-button" onclick="resetGame()">Reset</button>
+        <div class="button-row">
+            <button class="reset-button" onclick="resetGame()">Reset</button>
+            <button class="settings-button" onclick="openSettings()">Settings</button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <span class="close" onclick="closeSettings()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="settingsForm">
+                    <div class="settings-section">
+                        <h3>Animations</h3>
+                        <label>Animation Duration (ms): <input type="number" name="animationDuration" min="100" max="2000" step="50"></label>
+                        <label>Preview Transition (ms): <input type="number" name="previewTransition" min="50" max="1000" step="50"></label>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Element Sizes</h3>
+                        <label>Cell Size (px): <input type="number" name="cellSize" min="40" max="120" step="5"></label>
+                        <label>Grid Gap (px): <input type="number" name="gridGap" min="2" max="20" step="1"></label>
+                        <label>Preview Circle Size (px): <input type="number" name="previewCircleSize" min="30" max="100" step="5"></label>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Font Sizes</h3>
+                        <label>Cell Font Size (px): <input type="number" name="cellFontSize" min="12" max="48" step="2"></label>
+                        <label>Header Font Size (px): <input type="number" name="headerFontSize" min="24" max="72" step="4"></label>
+                        <label>Preview Font Size (px): <input type="number" name="previewFontSize" min="10" max="32" step="2"></label>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Colors</h3>
+                        <label>Background Color: <input type="color" name="backgroundColor"></label>
+                        <label>Board Background: <input type="color" name="boardBackground"></label>
+                        <label>Text Color: <input type="color" name="textColor"></label>
+                        <label>Button Background: <input type="color" name="buttonBackground"></label>
+                        <label>Empty Cell Color: <input type="color" name="emptyCellColor"></label>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Other</h3>
+                        <label>Connection Line Thickness: <input type="number" name="connectionLineThickness" min="2" max="20" step="1"></label>
+                        <label>Border Radius (px): <input type="number" name="borderRadius" min="0" max="20" step="1"></label>
+                        <label>Hover Scale: <input type="number" name="hoverScale" min="1.0" max="1.3" step="0.05"></label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-button" onclick="resetToDefaults()">Reset to Defaults</button>
+                <button class="modal-button" onclick="copyAsJSON()">Copy as JSON</button>
+                <button class="modal-button primary" onclick="applySettings()">Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JSON Display Modal -->
+    <div id="jsonModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings JSON</h2>
+                <span class="close" onclick="closeJSON()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <textarea id="jsonDisplay" readonly></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-button" onclick="copyJSONToClipboard()">Copy to Clipboard</button>
+                <button class="modal-button primary" onclick="closeJSON()">Close</button>
+            </div>
+        </div>
     </div>
 
     <script>
+        class SettingsManager {
+            constructor() {
+                this.defaults = {
+                    // Animation settings
+                    animationDuration: 250,
+                    previewTransition: 200,
+
+                    // Element sizes
+                    cellSize: 70,
+                    gridGap: 10,
+                    previewCircleSize: 60,
+
+                    // Font sizes
+                    cellFontSize: 28,
+                    headerFontSize: 48,
+                    previewFontSize: 18,
+
+                    // Colors
+                    backgroundColor: '#faf8ef',
+                    boardBackground: '#bbada0',
+                    textColor: '#776e65',
+                    buttonBackground: '#8f7a66',
+                    emptyCellColor: '#cdc1b4',
+
+                    // Other settings
+                    connectionLineThickness: 14,
+                    borderRadius: 6,
+                    hoverScale: 1.05,
+
+                    // Mobile specific
+                    mobileCellSize: 60,
+                    mobileGridGap: 5,
+                    mobilePreviewCircleSize: 50,
+                    mobileCellFontSize: 24,
+                    mobileHeaderFontSize: 36,
+                    mobilePreviewFontSize: 16,
+                    mobileConnectionLineThickness: 12
+                };
+
+                this.currentSettings = { ...this.defaults };
+                this.loadSettings();
+            }
+
+            loadSettings() {
+                const savedSettings = localStorage.getItem('connectItSettings');
+                if (savedSettings) {
+                    try {
+                        const parsed = JSON.parse(savedSettings);
+                        this.currentSettings = { ...this.defaults, ...parsed };
+                    } catch (e) {
+                        console.warn('Failed to load settings, using defaults');
+                    }
+                }
+            }
+
+            saveSettings() {
+                localStorage.setItem('connectItSettings', JSON.stringify(this.currentSettings));
+            }
+
+            updateSetting(key, value) {
+                this.currentSettings[key] = value;
+                this.saveSettings();
+                this.applySettings();
+            }
+
+            resetToDefaults() {
+                this.currentSettings = { ...this.defaults };
+                this.saveSettings();
+                this.applySettings();
+            }
+
+            applySettings() {
+                const root = document.documentElement;
+
+                // Apply CSS custom properties
+                root.style.setProperty('--animation-duration', this.currentSettings.animationDuration + 'ms');
+                root.style.setProperty('--preview-transition', this.currentSettings.previewTransition + 'ms');
+                root.style.setProperty('--cell-size', this.currentSettings.cellSize + 'px');
+                root.style.setProperty('--grid-gap', this.currentSettings.gridGap + 'px');
+                root.style.setProperty('--preview-circle-size', this.currentSettings.previewCircleSize + 'px');
+                root.style.setProperty('--cell-font-size', this.currentSettings.cellFontSize + 'px');
+                root.style.setProperty('--header-font-size', this.currentSettings.headerFontSize + 'px');
+                root.style.setProperty('--preview-font-size', this.currentSettings.previewFontSize + 'px');
+                root.style.setProperty('--background-color', this.currentSettings.backgroundColor);
+                root.style.setProperty('--board-background', this.currentSettings.boardBackground);
+                root.style.setProperty('--text-color', this.currentSettings.textColor);
+                root.style.setProperty('--button-background', this.currentSettings.buttonBackground);
+                root.style.setProperty('--empty-cell-color', this.currentSettings.emptyCellColor);
+                root.style.setProperty('--connection-line-thickness', this.currentSettings.connectionLineThickness + 'px');
+                root.style.setProperty('--border-radius', this.currentSettings.borderRadius + 'px');
+                root.style.setProperty('--hover-scale', this.currentSettings.hoverScale);
+
+                // Mobile settings
+                root.style.setProperty('--mobile-cell-size', this.currentSettings.mobileCellSize + 'px');
+                root.style.setProperty('--mobile-grid-gap', this.currentSettings.mobileGridGap + 'px');
+                root.style.setProperty('--mobile-preview-circle-size', this.currentSettings.mobilePreviewCircleSize + 'px');
+                root.style.setProperty('--mobile-cell-font-size', this.currentSettings.mobileCellFontSize + 'px');
+                root.style.setProperty('--mobile-header-font-size', this.currentSettings.mobileHeaderFontSize + 'px');
+                root.style.setProperty('--mobile-preview-font-size', this.currentSettings.mobilePreviewFontSize + 'px');
+                root.style.setProperty('--mobile-connection-line-thickness', this.currentSettings.mobileConnectionLineThickness + 'px');
+            }
+
+            getSettingsAsJSON() {
+                return JSON.stringify(this.currentSettings, null, 2);
+            }
+        }
+
         class ConnectItGame {
             constructor() {
                 this.board = [];
@@ -661,7 +1011,7 @@
                     });
 
                     // Wait for animation to complete
-                    setTimeout(resolve, 250);
+                    setTimeout(resolve, settings.currentSettings.animationDuration);
                 });
             }
 
@@ -764,7 +1114,7 @@
                     this.board = newBoard;
 
                     // Wait for animation to complete
-                    setTimeout(resolve, 250);
+                    setTimeout(resolve, settings.currentSettings.animationDuration);
                 });
             }
 
@@ -814,11 +1164,11 @@
                             // Remove animation class after animation completes
                             setTimeout(() => {
                                 cellElement.classList.remove('new-cell');
-                            }, 250);
+                            }, settings.currentSettings.animationDuration);
                         }
                     });
 
-                    setTimeout(resolve, 250);
+                    setTimeout(resolve, settings.currentSettings.animationDuration);
                 });
             }
 
@@ -856,14 +1206,124 @@
         }
 
         let game;
+        let settings;
 
         function initGame() {
+            settings = new SettingsManager();
+            settings.applySettings();
             game = new ConnectItGame();
         }
 
         function resetGame() {
             game.reset();
         }
+
+        // Settings modal functions
+        function openSettings() {
+            const modal = document.getElementById('settingsModal');
+            const form = document.getElementById('settingsForm');
+
+            // Populate form with current settings
+            populateSettingsForm();
+
+            modal.style.display = 'block';
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').style.display = 'none';
+        }
+
+        function populateSettingsForm() {
+            const form = document.getElementById('settingsForm');
+            const currentSettings = settings.currentSettings;
+
+            // Get all form inputs and populate them with current values
+            const inputs = form.querySelectorAll('input');
+            inputs.forEach(input => {
+                const settingName = input.name;
+                if (settingName && currentSettings.hasOwnProperty(settingName)) {
+                    let value = currentSettings[settingName];
+                    if (input.type === 'color' && !value.startsWith('#')) {
+                        // Convert color names or rgb values to hex if needed
+                        value = rgbToHex(value) || value;
+                    }
+                    input.value = value;
+                }
+            });
+        }
+
+        function applySettings() {
+            const form = document.getElementById('settingsForm');
+            const formData = new FormData(form);
+
+            // Update settings from form
+            for (let [key, value] of formData.entries()) {
+                if (key in settings.currentSettings) {
+                    // Convert string values to appropriate types
+                    if (typeof settings.currentSettings[key] === 'number') {
+                        value = parseFloat(value);
+                    }
+                    settings.updateSetting(key, value);
+                }
+            }
+
+            closeSettings();
+        }
+
+        function resetToDefaults() {
+            settings.resetToDefaults();
+            populateSettingsForm();
+        }
+
+        function copyAsJSON() {
+            document.getElementById('settingsModal').style.display = 'none';
+            document.getElementById('jsonModal').style.display = 'block';
+            document.getElementById('jsonDisplay').value = settings.getSettingsAsJSON();
+        }
+
+        function closeJSON() {
+            document.getElementById('jsonModal').style.display = 'none';
+        }
+
+        function copyJSONToClipboard() {
+            const textarea = document.getElementById('jsonDisplay');
+            textarea.select();
+            document.execCommand('copy');
+
+            // Show a brief confirmation (could enhance this with a toast message)
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = 'Copied!';
+            setTimeout(() => {
+                button.textContent = originalText;
+            }, 1000);
+        }
+
+        // Helper function to convert rgb color to hex
+        function rgbToHex(rgb) {
+            if (rgb.startsWith('#')) return rgb;
+
+            const result = rgb.match(/\d+/g);
+            if (!result || result.length < 3) return rgb;
+
+            return '#' + result.slice(0, 3).map(x => {
+                const hex = parseInt(x).toString(16);
+                return hex.length === 1 ? '0' + hex : hex;
+            }).join('');
+        }
+
+        // Close modals when clicking outside of them
+        window.addEventListener('click', function(event) {
+            const settingsModal = document.getElementById('settingsModal');
+            const jsonModal = document.getElementById('jsonModal');
+
+            if (event.target === settingsModal) {
+                closeSettings();
+            }
+            if (event.target === jsonModal) {
+                closeJSON();
+            }
+        });
 
         // Initialize the game when the page loads
         document.addEventListener('DOMContentLoaded', initGame);
