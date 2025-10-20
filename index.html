@@ -118,6 +118,7 @@
             user-select: none;
             transition: transform 0.1s;
             position: relative;
+            z-index: 10; /* Ensure cells appear above connection lines */
         }
 
         .cell:hover {
@@ -157,15 +158,16 @@
 
         .cell.connected {
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            font-size: 1.2em; /* Make numbers bigger when connected */
         }
 
         .connection-line {
             position: absolute;
-            height: 4px;
+            height: 14px; /* 1/5 of cell diameter (70px / 5 = 14px) */
             background: currentColor;
             transform-origin: left center;
             pointer-events: none;
-            z-index: 10;
+            z-index: 5; /* Lower z-index to appear underneath circles */
             transition: width 0.1s ease-out;
         }
 
@@ -218,6 +220,10 @@
                 width: 60px;
                 height: 60px;
                 font-size: 14px;
+            }
+
+            .connection-line {
+                height: 12px; /* 1/5 of mobile cell diameter (60px / 5 = 12px) */
             }
 
             h1 {
@@ -567,6 +573,10 @@
             }
 
             async animateCollapse(resultValue, lastCell) {
+                // Phase 0: Clear connections before starting collapse animation
+                this.clearConnections();
+                this.hidePreview();
+
                 // Phase 1: Move cells along connection lines to the target cell
                 await this.animateMovingCells(lastCell);
 
@@ -579,9 +589,7 @@
                 // Phase 4: Fill empty cells with animation
                 await this.animateFillEmptyCells();
 
-                // Phase 5: Clean up visual state and save the game
-                this.clearConnections();
-                this.hidePreview();
+                // Phase 5: Save the game
                 this.saveGame();
             }
 
