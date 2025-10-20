@@ -99,6 +99,22 @@ There's only one user, no registration or sign-in is required.
 
 The playing field is saved upon each move so that if the user closes the game at any point, they can then continue from where they left off.
 
+# Settings
+
+All parameters mentioned and implied above should be changeable through a Settings screen.
+This includes parameters such as: 
+- delays for animations
+- element sizes
+- font sizes
+- colors
+- other such parameters that cnage the appearance of the game
+
+There is a "Reset to defaults" button that resets all the settings.
+
+Settings are saved in the same storage as the game field.
+
+The settings screen has a "Copy as JSON" button that opens a text area with formatted JSON representing all of the current settings.
+
 # Tech Stack
 
 - This is a single-page application (single HTML file) written in HTML, CSS and JavaScript
