@@ -67,7 +67,7 @@
             "web_application": true
         },
         "external_apis": "external_apis.json",
-        "commit_message": "Increase font sizes for better visibility",
+        "commit_message": "Reduce number font size to 20% above base",
         "methods_to_test": "methods_to_test.json",
         "spec_diff": "--- +++ @@ -23,32 +23,41 @@ \n # Gameplay\n \n-Starting with any cell, the user can drag the mouse/their finger through the cells of the same value adjacent to it. While dragging, the affected cells of the same value as the starting cell are connected by lines of the same color as the circles in the cells. A preview above the game field displays the biggest whole power of 2 the sum of all the affected cells has reached. If the user drags the pointer back along the connecting line, it cancels the line (as if the adjacent cell was never affected). When the user releases the pointer, the affected cells all collapse into the last affected one and it gets replaced by the biggest power of 2 their sum has reached. The collapsed cells disappear and the cells above them slide directly downward. the vacant spots are filled with new values generated according to the algorithm below.\n+Starting with any cell, the user can drag the mouse/their finger through the cells of the same value adjacent to it. \n+While dragging, the affected cells of the same value as the starting cell are connected by lines of the same color as the circles in the cells. \n+A preview above the game field displays the biggest whole power of 2 the sum of all the affected cells has reached. \n+If the user drags the pointer back along the connecting line, it cancels the line (as if the adjacent cell was never affected). \n+When the user releases the pointer, the affected cells all collapse into the last affected one and it gets replaced by the biggest power of 2 their sum has reached. \n+The collapsed cells disappear and the cells above them slide directly downward. \n+The vacant spots are filled with new values generated according to the algorithm below.\n \n ## Rules of adjacency\n \n Two cells are adjacent if they share a side or a corner. Example:\n \n+```\n NNNNN\n NAAAN\n NAXAN\n NAAAN\n NNNNN\n+```\n \n The cells marked \"A\" are adjacent to the cell marked \"X\", while the cells marked \"N\" aren't\n \n The field is flat, meaning the the cells at the edges have fewer adjacent cells, e.g.:\n \n+```\n NNNNN\n AANNN\n XANNN\n AANNN\n NNNNN\n-\n+```\n \n ## Biggest whole power of 2 calculation examples\n \n-The value of the reulting cell after N cells of value X collapse is the biggest power of 2 that is less or equal to N * X, i.e. R = max(2^k | where 2^k <= N * X)\n+The value of the resulting cell after N cells of value X collapse is the biggest power of 2 that is less or equal to N * X, i.e. R = max(2^k | where 2^k <= N * X)\n \n - if the user connects 2 cells of value 4, they collapse into an 8\n - if the user connects 3 cells of value 4, they collapse into an 8 (4+4 = 8, is the biggest power of 2 <= 4+4+4=12)\n@@ -65,7 +74,6 @@ \n The user can reset the game field by pressing \"Reset\". In this case, a new initial state is generated (and immediately saved).\n \n-\n # Animations and smoothness\n \n It's important to maintain visual continuity for the user.\n@@ -75,6 +83,15 @@ - the newly generated values appear in vacated cells simlutaneously with an animation: the circles started small in the center and grow to full size\n - the whole time of the collapse, fall and replace animation should be about 0.5 sec\n \n+## Animating cell connections\n+\n+While the user is dragging the pointer and connecting cells of the same value:\n+- the connections are straight lines from the center of one cell to the other\n+- they are drawn before the circles and numbers to appear \"underneath\" the number\n+- they have the same colour as the circles\n+- the thickness of the connecting line is 1/5 of the circle diameter\n+- the numbers in the affected cells become bigger\n+- before the cell collapse animation, the connecting lines disappear\n \n # Users and data storage\n \n",
         "change_request": "",
@@ -286,6 +286,26 @@
             {
                 "checkpoint": "{\"run\":{\"id\":\"a21684ed-d46f-4fcd-9afa-780538309eea\",\"kind\":\"change_request\"},\"phase_id\":\"Done\",\"additional_id\":null}",
                 "timestamp": "2025-10-20T17:10:01.057025+00:00"
+            },
+            {
+                "checkpoint": "{\"run\":{\"id\":\"1e904ccd-1378-4697-b656-4d149845c5e3\",\"kind\":\"change_request\"},\"phase_id\":\"Init\",\"additional_id\":null}",
+                "timestamp": "2025-10-20T17:13:50.704594+00:00"
+            },
+            {
+                "checkpoint": "{\"run\":{\"id\":\"1e904ccd-1378-4697-b656-4d149845c5e3\",\"kind\":\"change_request\"},\"phase_id\":\"ProcessChangeRequest\",\"additional_id\":null}",
+                "timestamp": "2025-10-20T17:13:50.724691+00:00"
+            },
+            {
+                "checkpoint": "{\"run\":{\"id\":\"1e904ccd-1378-4697-b656-4d149845c5e3\",\"kind\":\"change_request\"},\"phase_id\":\"CheckChangeRequestsContradictions\",\"additional_id\":null}",
+                "timestamp": "2025-10-20T17:13:55.034694+00:00"
+            },
+            {
+                "checkpoint": "{\"run\":{\"id\":\"1e904ccd-1378-4697-b656-4d149845c5e3\",\"kind\":\"change_request\"},\"phase_id\":\"ImplementChangeRequest\",\"additional_id\":null}",
+                "timestamp": "2025-10-20T17:14:29.980217+00:00"
+            },
+            {
+                "checkpoint": "{\"run\":{\"id\":\"1e904ccd-1378-4697-b656-4d149845c5e3\",\"kind\":\"change_request\"},\"phase_id\":\"Done\",\"additional_id\":null}",
+                "timestamp": "2025-10-20T17:14:29.998644+00:00"
             }
         ]
     }
