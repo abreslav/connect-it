@@ -135,6 +135,30 @@
             transform-origin: left center;
             pointer-events: none;
             z-index: 10;
+            transition: width 0.1s ease-out;
+        }
+
+        .cell.moving {
+            transition: transform 0.25s ease-out;
+            z-index: 20;
+        }
+
+        .cell.falling {
+            transition: transform 0.25s ease-out;
+            z-index: 15;
+        }
+
+        .cell.new-cell {
+            animation: growIn 0.25s ease-out;
+        }
+
+        @keyframes growIn {
+            0% {
+                transform: scale(0);
+            }
+            100% {
+                transform: scale(1);
+            }
         }
 
         .reset-button {
@@ -318,6 +342,7 @@
                         cell.dataset.row = i;
                         cell.dataset.col = j;
                         cell.textContent = this.formatNumber(this.board[i][j]);
+                        cell.style.transform = ''; // Reset any previous transforms
 
                         if (this.needsRim(this.board[i][j])) {
                             cell.classList.add('rim');
@@ -453,12 +478,17 @@
                 line.className = 'connection-line';
                 line.style.left = x1 + 'px';
                 line.style.top = y1 + 'px';
-                line.style.width = length + 'px';
+                line.style.width = '0px';
                 line.style.transform = `rotate(${angle}rad)`;
                 line.style.color = window.getComputedStyle(cell1Element).backgroundColor;
 
                 gameBoard.appendChild(line);
                 this.connectionLines.push(line);
+
+                // Animate line appearance
+                requestAnimationFrame(() => {
+                    line.style.width = length + 'px';
+                });
             }
 
             clearConnections() {
@@ -499,78 +529,208 @@
 
                 const sum = this.connectedCells.length * this.currentValue;
                 const resultValue = this.getBiggestPowerOf2(sum);
-
-                // Set the last cell to the result value
                 const lastCell = this.connectedCells[this.connectedCells.length - 1];
+
+                // Start animation sequence
+                this.animateCollapse(resultValue, lastCell);
+            }
+
+            async animateCollapse(resultValue, lastCell) {
+                // Phase 1: Move cells along connection lines to the target cell
+                await this.animateMovingCells(lastCell);
+
+                // Phase 2: Update board data
+                this.updateBoardAfterCollapse(resultValue, lastCell);
+
+                // Phase 3: Apply gravity with animation
+                await this.animateGravity();
+
+                // Phase 4: Fill empty cells with animation
+                await this.animateFillEmptyCells();
+            }
+
+            animateMovingCells(targetCell) {
+                return new Promise(resolve => {
+                    const targetElement = document.querySelector(`[data-row="${targetCell.row}"][data-col="${targetCell.col}"]`);
+                    const targetRect = targetElement.getBoundingClientRect();
+                    const gameBoard = document.getElementById('gameBoard');
+                    const boardRect = gameBoard.getBoundingClientRect();
+
+                    // Move all cells except the target to the target position
+                    const movingCells = this.connectedCells.slice(0, -1);
+                    movingCells.forEach(cell => {
+                        const cellElement = document.querySelector(`[data-row="${cell.row}"][data-col="${cell.col}"]`);
+                        const cellRect = cellElement.getBoundingClientRect();
+
+                        const deltaX = targetRect.left - cellRect.left;
+                        const deltaY = targetRect.top - cellRect.top;
+
+                        cellElement.classList.add('moving');
+                        cellElement.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0)`;
+                    });
+
+                    // Wait for animation to complete
+                    setTimeout(resolve, 250);
+                });
+            }
+
+            updateBoardAfterCollapse(resultValue, lastCell) {
+                // Set the last cell to the result value
                 this.board[lastCell.row][lastCell.col] = resultValue;
 
-                // Mark other cells as empty (we'll use 0 to represent empty)
+                // Mark other cells as empty
                 for (let i = 0; i < this.connectedCells.length - 1; i++) {
                     const cell = this.connectedCells[i];
                     this.board[cell.row][cell.col] = 0;
                 }
 
-                // Apply gravity
-                this.applyGravity();
-
-                // Fill empty cells
-                this.fillEmptyCells();
-
-                // Re-render the board
-                this.render();
-            }
-
-            applyGravity() {
-                for (let j = 0; j < this.size; j++) {
-                    // Collect non-empty values in this column
-                    const values = [];
-                    for (let i = this.size - 1; i >= 0; i--) {
-                        if (this.board[i][j] !== 0) {
-                            values.push(this.board[i][j]);
-                        }
-                    }
-
-                    // Fill column from bottom up
-                    for (let i = this.size - 1; i >= 0; i--) {
-                        if (values.length > 0) {
-                            this.board[i][j] = values.shift();
-                        } else {
-                            this.board[i][j] = 0;
-                        }
-                    }
+                // Update the target cell immediately
+                const targetElement = document.querySelector(`[data-row="${lastCell.row}"][data-col="${lastCell.col}"]`);
+                targetElement.dataset.value = resultValue;
+                targetElement.textContent = this.formatNumber(resultValue);
+                targetElement.className = 'cell';
+                if (this.needsRim(resultValue)) {
+                    targetElement.classList.add('rim');
                 }
             }
 
-            fillEmptyCells() {
-                const emptyCells = [];
+            animateGravity() {
+                return new Promise(resolve => {
+                    // First, calculate what the board should look like after gravity
+                    const newBoard = [];
+                    for (let i = 0; i < this.size; i++) {
+                        newBoard[i] = [];
+                        for (let j = 0; j < this.size; j++) {
+                            newBoard[i][j] = 0;
+                        }
+                    }
 
-                // Find all empty cells
-                for (let i = 0; i < this.size; i++) {
+                    // Apply gravity logic to get final positions
                     for (let j = 0; j < this.size; j++) {
-                        if (this.board[i][j] === 0) {
-                            emptyCells.push([i, j]);
+                        const values = [];
+                        for (let i = this.size - 1; i >= 0; i--) {
+                            if (this.board[i][j] !== 0) {
+                                values.push(this.board[i][j]);
+                            }
+                        }
+                        for (let i = this.size - 1; i >= 0; i--) {
+                            if (values.length > 0) {
+                                newBoard[i][j] = values.shift();
+                            }
                         }
                     }
-                }
 
-                // Fill with random values
-                emptyCells.forEach(([i, j]) => {
-                    this.board[i][j] = this.getRandomPowerOf2();
-                });
+                    // Animate cells that need to move
+                    const movements = [];
+                    for (let j = 0; j < this.size; j++) {
+                        const originalValues = [];
+                        const finalValues = [];
 
-                // Check if the board is still playable
-                if (!this.hasAdjacentPairs() && emptyCells.length > 0) {
-                    // Replace one random new cell with a value that matches an adjacent cell
-                    const randomNewCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-                    const [i, j] = randomNewCell;
-                    const neighbors = this.getNeighbors(i, j);
+                        // Get original non-zero values and their positions
+                        for (let i = 0; i < this.size; i++) {
+                            if (this.board[i][j] !== 0) {
+                                originalValues.push({ row: i, value: this.board[i][j] });
+                            }
+                        }
 
-                    if (neighbors.length > 0) {
-                        const [ni, nj] = neighbors[Math.floor(Math.random() * neighbors.length)];
-                        this.board[i][j] = this.board[ni][nj];
+                        // Get final positions of non-zero values
+                        for (let i = 0; i < this.size; i++) {
+                            if (newBoard[i][j] !== 0) {
+                                finalValues.push({ row: i, value: newBoard[i][j] });
+                            }
+                        }
+
+                        // Match original positions to final positions
+                        for (let k = 0; k < originalValues.length; k++) {
+                            const originalCell = originalValues[k];
+                            const finalCell = finalValues[k];
+
+                            if (originalCell.row !== finalCell.row) {
+                                movements.push({
+                                    fromRow: originalCell.row,
+                                    toRow: finalCell.row,
+                                    col: j,
+                                    value: originalCell.value
+                                });
+                            }
+                        }
                     }
-                }
+
+                    // Apply visual animations
+                    movements.forEach(movement => {
+                        const cellElement = document.querySelector(`[data-row="${movement.fromRow}"][data-col="${movement.col}"]`);
+                        if (cellElement) {
+                            const cellHeight = cellElement.offsetHeight;
+                            const gap = 10; // grid gap
+                            const deltaY = (movement.toRow - movement.fromRow) * (cellHeight + gap);
+
+                            cellElement.classList.add('falling');
+                            cellElement.style.transform = `translateY(${deltaY}px)`;
+                        }
+                    });
+
+                    // Update the board state
+                    this.board = newBoard;
+
+                    // Wait for animation to complete
+                    setTimeout(resolve, 250);
+                });
             }
+
+            animateFillEmptyCells() {
+                return new Promise(resolve => {
+                    const emptyCells = [];
+                    for (let i = 0; i < this.size; i++) {
+                        for (let j = 0; j < this.size; j++) {
+                            if (this.board[i][j] === 0) {
+                                emptyCells.push([i, j]);
+                            }
+                        }
+                    }
+
+                    // Generate new values
+                    const newValues = [];
+                    emptyCells.forEach(([i, j]) => {
+                        const value = this.getRandomPowerOf2();
+                        this.board[i][j] = value;
+                        newValues.push({ row: i, col: j, value });
+                    });
+
+                    // Check if board is still playable
+                    if (!this.hasAdjacentPairs() && emptyCells.length > 0) {
+                        const randomNewCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                        const [i, j] = randomNewCell;
+                        const neighbors = this.getNeighbors(i, j);
+                        if (neighbors.length > 0) {
+                            const [ni, nj] = neighbors[Math.floor(Math.random() * neighbors.length)];
+                            this.board[i][j] = this.board[ni][nj];
+                            // Update the corresponding newValue
+                            const newValueEntry = newValues.find(nv => nv.row === i && nv.col === j);
+                            if (newValueEntry) {
+                                newValueEntry.value = this.board[i][j];
+                            }
+                        }
+                    }
+
+                    // Re-render entire board
+                    this.render();
+
+                    // Add animation class to new cells
+                    newValues.forEach(({ row, col }) => {
+                        const cellElement = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+                        if (cellElement) {
+                            cellElement.classList.add('new-cell');
+                            // Remove animation class after animation completes
+                            setTimeout(() => {
+                                cellElement.classList.remove('new-cell');
+                            }, 250);
+                        }
+                    });
+
+                    setTimeout(resolve, 250);
+                });
+            }
+
 
             saveGame() {
                 localStorage.setItem('connectItGame', JSON.stringify(this.board));
