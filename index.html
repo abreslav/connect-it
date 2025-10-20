@@ -461,11 +461,11 @@
 
                 if (this.connectedCells.length > 1) {
                     this.collapseConnectedCells();
+                } else {
+                    // If no cells were collapsed, we still need to clean up
+                    this.clearConnections();
+                    this.hidePreview();
                 }
-
-                this.clearConnections();
-                this.hidePreview();
-                this.saveGame();
             }
 
             updateConnectedCells() {
@@ -578,6 +578,11 @@
 
                 // Phase 4: Fill empty cells with animation
                 await this.animateFillEmptyCells();
+
+                // Phase 5: Clean up visual state and save the game
+                this.clearConnections();
+                this.hidePreview();
+                this.saveGame();
             }
 
             animateMovingCells(targetCell) {

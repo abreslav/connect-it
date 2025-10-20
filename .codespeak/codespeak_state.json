@@ -67,7 +67,7 @@
             "web_application": true
         },
         "external_apis": "external_apis.json",
-        "commit_message": "Fix preview circle colors and visibility",
+        "commit_message": "Fix: save game state after collapse animation completes",
         "methods_to_test": "methods_to_test.json",
         "spec_diff": "--- +++ @@ -66,6 +66,16 @@ The user can reset the game field by pressing \"Reset\". In this case, a new initial state is generated (and immediately saved).\n \n \n+# Animations and smoothness\n+\n+It's important to maintain visual continuity for the user.\n+The field should always update smoothly: no blinking, and all changes should happen visually:\n+- when the user is dragging the pointer, the lines between cells appear gradually (without much delay)\n+- when the cells collapse, they should move along the connecting line from the first touched to the last making room for the ones above them to fall down also visibly\n+- the newly generated values appear in vacated cells simlutaneously with an animation: the circles started small in the center and grow to full size\n+- the whole time of the collapse, fall and replace animation should be about 0.5 sec\n+\n+\n # Users and data storage\n \n There's only one user, no registration or sign-in is required.\n",
         "change_request": "",
@@ -182,6 +182,26 @@
             {
                 "checkpoint": "{\"run\":{\"id\":\"02f876db-b1a0-4002-9a6f-7cc9a8ecf7f9\",\"kind\":\"change_request\"},\"phase_id\":\"Done\",\"additional_id\":null}",
                 "timestamp": "2025-10-20T15:00:14.207305+00:00"
+            },
+            {
+                "checkpoint": "{\"run\":{\"id\":\"f0e20676-dd34-48f4-b443-e818493a8bfb\",\"kind\":\"change_request\"},\"phase_id\":\"Init\",\"additional_id\":null}",
+                "timestamp": "2025-10-20T16:21:39.463330+00:00"
+            },
+            {
+                "checkpoint": "{\"run\":{\"id\":\"f0e20676-dd34-48f4-b443-e818493a8bfb\",\"kind\":\"change_request\"},\"phase_id\":\"ProcessChangeRequest\",\"additional_id\":null}",
+                "timestamp": "2025-10-20T16:21:39.482395+00:00"
+            },
+            {
+                "checkpoint": "{\"run\":{\"id\":\"f0e20676-dd34-48f4-b443-e818493a8bfb\",\"kind\":\"change_request\"},\"phase_id\":\"CheckChangeRequestsContradictions\",\"additional_id\":null}",
+                "timestamp": "2025-10-20T16:21:43.529845+00:00"
+            },
+            {
+                "checkpoint": "{\"run\":{\"id\":\"f0e20676-dd34-48f4-b443-e818493a8bfb\",\"kind\":\"change_request\"},\"phase_id\":\"ImplementChangeRequest\",\"additional_id\":null}",
+                "timestamp": "2025-10-20T16:22:40.252931+00:00"
+            },
+            {
+                "checkpoint": "{\"run\":{\"id\":\"f0e20676-dd34-48f4-b443-e818493a8bfb\",\"kind\":\"change_request\"},\"phase_id\":\"Done\",\"additional_id\":null}",
+                "timestamp": "2025-10-20T16:22:40.270122+00:00"
             }
         ]
     }
