@@ -105,6 +105,10 @@
             {
                 "checkpoint": "{\"run\":{\"id\":\"a7062149-af7e-49ca-9a56-7d5b1d82e776\",\"kind\":\"build\"},\"phase_id\":\"GenerateAndRunTests\",\"additional_id\":null}",
                 "timestamp": "2025-10-20T14:42:51.176049+00:00"
+            },
+            {
+                "checkpoint": "{\"run\":{\"id\":\"a7062149-af7e-49ca-9a56-7d5b1d82e776\",\"kind\":\"build\"},\"phase_id\":\"Done\",\"additional_id\":null}",
+                "timestamp": "2025-10-20T14:42:51.190520+00:00"
             }
         ]
     }
