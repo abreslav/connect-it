@@ -66,6 +66,16 @@ When the cells are vacated by some cells collapsing and then the cells above the
 The user can reset the game field by pressing "Reset". In this case, a new initial state is generated (and immediately saved).
 
 
+# Animations and smoothness
+
+It's important to maintain visual continuity for the user.
+The field should always update smoothly: no blinking, and all changes should happen visually:
+- when the user is dragging the pointer, the lines between cells appear gradually (without much delay)
+- when the cells collapse, they should move along the connecting line from the first touched to the last making room for the ones above them to fall down also visibly
+- the newly generated values appear in vacated cells simlutaneously with an animation: the circles started small in the center and grow to full size
+- the whole time of the collapse, fall and replace animation should be about 0.5 sec
+
+
 # Users and data storage
 
 There's only one user, no registration or sign-in is required.

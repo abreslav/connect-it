@@ -62,7 +62,8 @@
         },
         "external_apis": "external_apis.json",
         "commit_message": "Implement Connect-it! puzzle game with drag-to-connect mechanics",
-        "methods_to_test": "methods_to_test.json"
+        "methods_to_test": "methods_to_test.json",
+        "spec_diff": "--- +++ @@ -66,6 +66,16 @@ The user can reset the game field by pressing \"Reset\". In this case, a new initial state is generated (and immediately saved).\n \n \n+# Animations and smoothness\n+\n+It's important to maintain visual continuity for the user.\n+The field should always update smoothly: no blinking, and all changes should happen visually:\n+- when the user is dragging the pointer, the lines between cells appear gradually (without much delay)\n+- when the cells collapse, they should move along the connecting line from the first touched to the last making room for the ones above them to fall down also visibly\n+- the newly generated values appear in vacated cells simlutaneously with an animation: the circles started small in the center and grow to full size\n+- the whole time of the collapse, fall and replace animation should be about 0.5 sec\n+\n+\n # Users and data storage\n \n There's only one user, no registration or sign-in is required.\n"
     },
     "phase_manager": {
         "history": [
@@ -113,6 +114,10 @@
             {
                 "checkpoint": "{\"run\":{\"id\":\"5a681bac-a3bc-4f01-be24-b87c860164e1\",\"kind\":\"build\"},\"phase_id\":\"Init\",\"additional_id\":null}",
                 "timestamp": "2025-10-20T14:47:29.559964+00:00"
+            },
+            {
+                "checkpoint": "{\"run\":{\"id\":\"5a681bac-a3bc-4f01-be24-b87c860164e1\",\"kind\":\"build\"},\"phase_id\":\"ProcessSpec\",\"additional_id\":null}",
+                "timestamp": "2025-10-20T14:47:29.589424+00:00"
             }
         ]
     }
