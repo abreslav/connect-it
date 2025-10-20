@@ -178,6 +178,10 @@
             {
                 "checkpoint": "{\"run\":{\"id\":\"02f876db-b1a0-4002-9a6f-7cc9a8ecf7f9\",\"kind\":\"change_request\"},\"phase_id\":\"ImplementChangeRequest\",\"additional_id\":null}",
                 "timestamp": "2025-10-20T15:00:14.190364+00:00"
+            },
+            {
+                "checkpoint": "{\"run\":{\"id\":\"02f876db-b1a0-4002-9a6f-7cc9a8ecf7f9\",\"kind\":\"change_request\"},\"phase_id\":\"Done\",\"additional_id\":null}",
+                "timestamp": "2025-10-20T15:00:14.207305+00:00"
             }
         ]
     }
