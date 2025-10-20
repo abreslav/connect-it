@@ -1,4 +1,5 @@
 [
     "Bug: changes must be saved right after the cells collapse, but they are not. When I refresh the page the state rools back one move",
+    "Bugs: \n- lines are drawn off center (slightly low)\n- there's a noticeable lag between moving the pointer and seeing the line\n- the lines blink a lot as I'm moving the mouse\n\nMake sure there's no blinking. I'd suggest re-drawing only when necessary or use something like double buffering to make sure the user doesn't see incomplete images",
     "I observe a bug: There must be a preview above the game field while I'm connecting cells, but I can see no preview"
 ]
