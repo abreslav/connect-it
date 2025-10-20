@@ -168,7 +168,6 @@
             transform-origin: left center;
             pointer-events: none;
             z-index: 5; /* Lower z-index to appear underneath circles */
-            transition: width 0.1s ease-out;
         }
 
         .cell.moving {
@@ -258,6 +257,7 @@
                 this.startCell = null;
                 this.currentValue = 0;
                 this.connectionLines = [];
+                this.updatePending = false; // Flag to throttle updates
 
                 this.initializeBoard();
                 this.loadGame();
@@ -441,9 +441,15 @@
                 // Check if this cell is already in the path
                 const cellIndex = this.connectedCells.findIndex(c => c.row === row && c.col === col);
 
+                let needsUpdate = false;
+
                 if (cellIndex !== -1) {
                     // Backtrack: remove all cells after this one
-                    this.connectedCells = this.connectedCells.slice(0, cellIndex + 1);
+                    const newLength = cellIndex + 1;
+                    if (this.connectedCells.length !== newLength) {
+                        this.connectedCells = this.connectedCells.slice(0, newLength);
+                        needsUpdate = true;
+                    }
                 } else {
                     // Check if adjacent to last cell
                     const lastCell = this.connectedCells[this.connectedCells.length - 1];
@@ -452,11 +458,19 @@
 
                     if (isAdjacent) {
                         this.connectedCells.push({ row, col });
+                        needsUpdate = true;
                     }
                 }
 
-                this.updateConnectedCells();
-                this.updatePreview();
+                // Throttle updates using requestAnimationFrame
+                if (needsUpdate && !this.updatePending) {
+                    this.updatePending = true;
+                    requestAnimationFrame(() => {
+                        this.updateConnectedCells();
+                        this.updatePreview();
+                        this.updatePending = false;
+                    });
+                }
             }
 
             handleEnd(event) {
@@ -475,10 +489,11 @@
             }
 
             updateConnectedCells() {
-                // Clear all connection visuals
-                this.clearConnections();
+                // Update connected class on all cells (remove from all, then add to connected)
+                document.querySelectorAll('.cell.connected').forEach(cell => {
+                    cell.classList.remove('connected');
+                });
 
-                // Add connected class to cells
                 this.connectedCells.forEach(cell => {
                     const cellElement = document.querySelector(`[data-row="${cell.row}"][data-col="${cell.col}"]`);
                     if (cellElement) {
@@ -486,13 +501,45 @@
                     }
                 });
 
-                // Draw connection lines
-                for (let i = 0; i < this.connectedCells.length - 1; i++) {
-                    this.drawConnectionLine(this.connectedCells[i], this.connectedCells[i + 1]);
+                // Update connection lines efficiently
+                this.updateConnectionLines();
+            }
+
+            updateConnectionLines() {
+                const requiredLines = this.connectedCells.length - 1;
+
+                // Remove excess lines if we have too many
+                while (this.connectionLines.length > requiredLines) {
+                    const line = this.connectionLines.pop();
+                    line.remove();
+                }
+
+                // Update existing lines and add new ones as needed
+                for (let i = 0; i < requiredLines; i++) {
+                    if (i < this.connectionLines.length) {
+                        // Update existing line
+                        this.updateConnectionLine(this.connectionLines[i], this.connectedCells[i], this.connectedCells[i + 1]);
+                    } else {
+                        // Create new line
+                        const line = this.createConnectionLine(this.connectedCells[i], this.connectedCells[i + 1]);
+                        this.connectionLines.push(line);
+                    }
                 }
             }
 
-            drawConnectionLine(cell1, cell2) {
+            createConnectionLine(cell1, cell2) {
+                const gameBoard = document.getElementById('gameBoard');
+                const line = document.createElement('div');
+                line.className = 'connection-line';
+                gameBoard.appendChild(line);
+
+                // Set up the line immediately without animation for smoother experience
+                this.updateConnectionLine(line, cell1, cell2);
+
+                return line;
+            }
+
+            updateConnectionLine(lineElement, cell1, cell2) {
                 const gameBoard = document.getElementById('gameBoard');
                 const cell1Element = document.querySelector(`[data-row="${cell1.row}"][data-col="${cell1.col}"]`);
                 const cell2Element = document.querySelector(`[data-row="${cell2.row}"][data-col="${cell2.col}"]`);
@@ -511,22 +558,17 @@
                 const length = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
                 const angle = Math.atan2(y2 - y1, x2 - x1);
 
-                const line = document.createElement('div');
-                line.className = 'connection-line';
-                line.style.left = x1 + 'px';
-                line.style.top = y1 + 'px';
-                line.style.width = '0px';
-                line.style.transform = `rotate(${angle}rad)`;
-                line.style.color = window.getComputedStyle(cell1Element).backgroundColor;
+                // Get the actual line height from computed styles
+                const lineHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--line-height') ||
+                    (window.innerWidth <= 600 ? '12' : '14'));
 
-                gameBoard.appendChild(line);
-                this.connectionLines.push(line);
-
-                // Animate line appearance
-                requestAnimationFrame(() => {
-                    line.style.width = length + 'px';
-                });
+                lineElement.style.left = x1 + 'px';
+                lineElement.style.top = (y1 - lineHeight / 2) + 'px';
+                lineElement.style.width = length + 'px';
+                lineElement.style.transform = `rotate(${angle}rad)`;
+                lineElement.style.color = window.getComputedStyle(cell1Element).backgroundColor;
             }
+
 
             clearConnections() {
                 // Remove connected class from all cells
