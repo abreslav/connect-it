@@ -53,12 +53,10 @@
             "desktop_application": false,
             "embedded_application": false,
             "has_django": false,
-            "has_external_apis": false,
             "has_javascript": true,
             "has_node_js": false,
             "has_python": false,
             "has_server": false,
-            "has_social_logins": false,
             "has_sql_database": false,
             "library": false,
             "mobile_application": false,
@@ -402,6 +400,10 @@
             {
                 "checkpoint": "{\"run\":{\"id\":\"fda5fecf-4e82-4597-9c03-cdc0a7a221d7\",\"kind\":\"build\"},\"phase_id\":\"ProcessSpec\",\"additional_id\":null}",
                 "timestamp": "2025-10-31T11:41:12.217181+00:00"
+            },
+            {
+                "checkpoint": "{\"run\":{\"id\":\"fda5fecf-4e82-4597-9c03-cdc0a7a221d7\",\"kind\":\"build\"},\"phase_id\":\"EvaluateCriteria\",\"additional_id\":null}",
+                "timestamp": "2025-10-31T11:41:26.131911+00:00"
             }
         ]
     }
