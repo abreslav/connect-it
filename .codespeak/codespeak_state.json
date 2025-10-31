@@ -430,6 +430,10 @@
             {
                 "checkpoint": "{\"run\":{\"id\":\"fda5fecf-4e82-4597-9c03-cdc0a7a221d7\",\"kind\":\"build\"},\"phase_id\":\"AnalyzeAndPlanTests\",\"additional_id\":null}",
                 "timestamp": "2025-10-31T11:42:17.795371+00:00"
+            },
+            {
+                "checkpoint": "{\"run\":{\"id\":\"fda5fecf-4e82-4597-9c03-cdc0a7a221d7\",\"kind\":\"build\"},\"phase_id\":\"GenerateAndRunTests\",\"additional_id\":null}",
+                "timestamp": "2025-10-31T11:42:17.816769+00:00"
             }
         ]
     }
