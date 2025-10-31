@@ -90,7 +90,6 @@ While the user is dragging the pointer and connecting cells of the same value:
 - they are drawn before the circles and numbers to appear "underneath" the number
 - they have the same colour as the circles
 - the thickness of the connecting line is 1/5 of the circle diameter
-- the numbers in the affected cells become bigger
 - before the cell collapse animation, the connecting lines disappear
 
 # Users and data storage
